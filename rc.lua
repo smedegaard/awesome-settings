@@ -14,6 +14,24 @@ local beautiful = require("beautiful")
 local naughty = require("naughty")
 local menubar = require("menubar")
 
+
+-- Volume controls
+volnotify = {}
+volnotify.id = nil
+function volnotify:notify (msg)
+      self.id = naughty.notify({ text = msg, timeout = 1, 
+replaces_id = self.id}).id
+end
+
+function volume(incdec)
+  awful.util.spawn_with_shell ("vol=$(amixer set Master 5%" .. incdec .. "|tail -1|cut -d % -f 1|cut -d '[' -f 2) && echo \\\"volnotify:notify('Volume $vol%')\\\"|awesome-client -", false)
+end
+
+function togglemute()
+  awful.util.spawn_with_shell("vol=$(amixer -D pulse set Master +1 toggle|tail -n 1|cut -d '[' -f 3|cut -d ']' -f 1) && echo \\\"volnotify:notify('Volume $vol')\\\"|awesome-client -", false)
+end
+-- volume end
+
 -- Load Debian menu entries
 require("debian.menu")
 
@@ -226,11 +244,10 @@ root.buttons(awful.util.table.join(
 -- }}}
 
 -- {{{ Key bindings
-globalkeys = awful.util.table.join(
---volume controls
-    awful.key({}, "#122", function () awful.util.spawn("vol down 10") end),
-    awful.key({}, "#123", function () awful.util.spawn("vol up 10") end),
-    awful.key({}, "#121", function () awful.util.spawn("vol mute") end),
+globalkeys = awful.util.table.join(globalkeys,
+awful.key({}, "XF86AudioMute", togglemute),
+awful.key({}, "XF86AudioLowerVolume", function() volume("-") end),
+awful.key({}, "XF86AudioRaiseVolume", function() volume("+") end),
 
 -- screen lock
     awful.key({ modkey, "Control" }, "l", function () awful.util.spawn("slock") end),
