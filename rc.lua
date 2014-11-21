@@ -14,6 +14,11 @@ local beautiful = require("beautiful")
 local naughty = require("naughty")
 local menubar = require("menubar")
 
+-- {{{ Startup applications
+os.execute("eval `run_once gnome-keyring-daemon`")
+os.execute("run_once nm-applet")
+os.execute("run_once pidgin")
+-- }}}
 
 -- Volume controls
 volnotify = {}
@@ -504,3 +509,6 @@ end)
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
+
+awful.util.spawn_with_shell("/usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1")
+awful.util.spawn_with_shell("run_once nm-applet")
