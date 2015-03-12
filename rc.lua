@@ -29,11 +29,11 @@ replaces_id = self.id}).id
 end
 
 function volume(incdec)
-  awful.util.spawn_with_shell ("vol=$(amixer set Master 5%" .. incdec .. "|tail -1|cut -d % -f 1|cut -d '[' -f 2) && echo \\\"volnotify:notify('Volume $vol%')\\\"|awesome-client -", false)
+  awful.util.spawn_with_shell ("vol=$(amixer -c 1 sset PCM 5%" .. incdec .. "|tail -1|cut -d % -f 1|cut -d '[' -f 2) && echo \\\"volnotify:notify('Volume $vol%')\\\"|awesome-client -", false)
 end
 
 function togglemute()
-  awful.util.spawn_with_shell("vol=$(amixer -D pulse set Master +1 toggle|tail -n 1|cut -d '[' -f 3|cut -d ']' -f 1) && echo \\\"volnotify:notify('Volume $vol')\\\"|awesome-client -", false)
+  awful.util.spawn_with_shell("vol=$(amixer -c 1 set PCM +1 toggle|tail -n 1|cut -d '[' -f 3|cut -d ']' -f 1) && echo \\\"volnotify:notify('Volume $vol')\\\"|awesome-client -", false)
 end
 -- volume end
 
@@ -250,6 +250,26 @@ root.buttons(awful.util.table.join(
 
 -- {{{ Key bindings
 globalkeys = awful.util.table.join(globalkeys,
+
+awful.key({ modkey, "Shift"   }, ",",
+function (c)
+  local curidx = awful.tag.getidx()
+  if curidx == 1 then
+    awful.client.movetotag(tags[client.focus.screen][9])
+  else
+    awful.client.movetotag(tags[client.focus.screen][curidx - 1])
+  end
+end),
+awful.key({ modkey, "Shift"   }, ".",
+function (c)
+  local curidx = awful.tag.getidx()
+  if curidx == 9 then
+    awful.client.movetotag(tags[client.focus.screen][1])
+  else
+    awful.client.movetotag(tags[client.focus.screen][curidx + 1])
+  end
+end),
+
 awful.key({}, "XF86AudioMute", togglemute),
 awful.key({}, "XF86AudioLowerVolume", function() volume("-") end),
 awful.key({}, "XF86AudioRaiseVolume", function() volume("+") end),
